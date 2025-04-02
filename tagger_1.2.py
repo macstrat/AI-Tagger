@@ -120,7 +120,8 @@ nltk.download('averaged_perceptron_tagger', quiet=True)
 nltk.download('wordnet', quiet=True)
 nltk.download('omw-1.4', quiet=True)
 
-
+def clean_utf8(text):
+    return text.encode("utf-8", "ignore").decode("utf-8", "ignore").strip()
 
 import face_recognition
 
@@ -461,6 +462,31 @@ def extract_folder_context(folder_path):
     context = re.sub(r"[-_]", " ", folder_name).strip()
     return context
 
+def extract_folder_context(folder_path):
+    folder_name = os.path.basename(folder_path)
+
+    # Normalize separators and lower-case
+    cleaned = re.sub(r"[-_]", " ", folder_name).lower()
+
+    # Split into words
+    words = cleaned.split()
+
+    # Filter: only alphabetic or mixed words, length > 2
+    meaningful = [w for w in words if any(c.isalpha() for c in w) and len(w) > 2]
+
+    # Rejoin
+    context = " ".join(meaningful).strip()
+
+    # Final fallback if context is still junk
+    return context if context and not is_junk_folder_name(context) else ""
+
+def is_junk_folder_name(name):
+    name = name.lower()
+    if len(name) <= 3:
+        return True
+    if re.fullmatch(r'[a-z0-9_\-]+', name):  # All lowercase letters, digits, underscores/hyphens
+        return True
+    return False
 
 def generate_batch_captions(image_paths, processor, model, preloaded_images=None):
     images = []
@@ -491,22 +517,23 @@ def generate_batch_captions(image_paths, processor, model, preloaded_images=None
     # === Now tag generation ===
    
 
-    prompt_tag = "Create 10 descriptive stock photo tags based on this sentence: "
+    prompt_tag = (
+    "You are an AI describing stock photography. Generate a comma-separated list of 8–12 short, relevant tags based only on visible content. "
+    "Do NOT include file names, folder names, numbers, or abstract/emotional words. "
+    "Only tag what is clearly seen in the photo — such as objects, people, settings, and actions."
+)
 
     prompts = []
     for img_path, cap in zip(image_paths, captions):
-        context = extract_folder_context(img_path)
+        folder_path = os.path.dirname(img_path)
+        raw_folder = os.path.basename(folder_path)
+        context = "" if is_junk_folder_name(raw_folder) else extract_folder_context(folder_path)
+        
         if context:
-            full_prompt = (
-                f"{prompt_tag}\"{cap.strip()}\". "
-                f"This image is from a set titled \"{context}\". "
-                "Avoid abstract or emotional terms. Only include clearly visible objects, settings, or actions. Return a comma-separated list."
-            )
+            full_prompt = f"{prompt_tag} Caption: \"{cap.strip()}\". Context: \"{context}\""
         else:
-            full_prompt = (
-                f"{prompt_tag}\"{cap.strip()}\". "
-                "Avoid abstract or emotional terms. Only include clearly visible objects, settings, or actions. Return a comma-separated list."
-            )
+            full_prompt = f"{prompt_tag} Caption: \"{cap.strip()}\""
+        
         prompts.append(full_prompt)
     
 
@@ -561,22 +588,50 @@ def extract_tags(caption, config):
     )
 
     return sorted(tags)[:config.get('max_tags', 15)]
+    
+def read_existing_keywords(image_path):
+    try:
+        exiftool_exe = r'C:\exiftool\exiftool.exe'
+        result = subprocess.run(
+            [exiftool_exe, "-Keywords", "-XMP-dc:Subject", "-s3", image_path],
+            capture_output=True, text=True
+        )
+        lines = result.stdout.strip().splitlines()
+        keywords = set()
+        for line in lines:
+            if line:
+                for kw in line.split(","):
+                    cleaned = clean_utf8(kw.strip().lower())
+                    if cleaned:
+                        keywords.add(cleaned)
+        return sorted(keywords)
+    except Exception as e:
+        return []
+
 
 def write_exif(image_path, caption, tags):
     try:
         exiftool_exe = r'C:\exiftool\exiftool.exe'
-        
+
+        # Step 1: Read existing keywords
+        existing_tags = read_existing_keywords(image_path)
+        merged_tags = sorted(set(existing_tags) | set(tags))
+
+        # Step 2: Strip Photoshop blocks that may cause conflict
+        subprocess.run([exiftool_exe, "-Photoshop:All=", "-overwrite_original", image_path],
+                       capture_output=True, text=True)
+
+        # Step 3: Build new metadata write command
         cmd = [
             exiftool_exe,
             '-charset', 'utf8',
             '-overwrite_original',
-            f'-IPTC:Caption-Abstract={caption}',
-            f'-XMP-dc:Title={caption}',
-            f'-XMP-dc:Description={caption}',
+            f'-IPTC:Caption-Abstract={clean_utf8(caption)}',
+            f'-XMP-dc:Title={clean_utf8(caption)}',
+            f'-XMP-dc:Description={clean_utf8(caption)}',
         ]
-
-        # ✅ Add each tag individually to avoid quotes/wrapping
-        for tag in sorted(tags):
+        for tag in sorted(merged_tags):
+            tag = clean_utf8(tag)
             cmd.append(f'-XMP-dc:Subject={tag}')
             cmd.append(f'-IPTC:Keywords={tag}')
 
@@ -585,11 +640,10 @@ def write_exif(image_path, caption, tags):
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.stderr:
             raise RuntimeError(f"ExifTool Error ({image_path}): {result.stderr.strip()}")
-        # if result.stdout:
-            # tqdm.write(f"ExifTool Output ({image_path}): {result.stdout.strip()}")
 
     except Exception as e:
         raise RuntimeError(f"Error writing EXIF for {image_path}: {e}")
+
 
 def process_folder(root_folder, config, processor, model):
     yolo_model = setup_yolo('models/yolov8x.pt')
