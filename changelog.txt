@@ -1,0 +1,6 @@
+4/2/2025 ----
+
+- Fixed an issue where it was pulling filenames as tags. 
+- Added File name filtering and more directed prompting. 
+- Fixed a UTF-8 Write error with exiftool. 
+- Filed an issue with old Photoshop tags throwing back an Exif Write Errorex
