@@ -16,8 +16,7 @@ def download_blip2_model(model_name='flan-t5-xl'):
 
 def download_yolo_model():
     print("⬇️ Downloading YOLOv8x model...")
-    yolo = YOLO("yolov8x.pt")
-    yolo.model.save("models/yolov8x.pt")
+    YOLO("yolov8x.pt")
     print("✅ YOLOv8x model downloaded.")
 
 def main():
