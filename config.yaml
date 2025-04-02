@@ -1,0 +1,38 @@
+# === METADATA TOOL ===
+exiftool_path: C:\exiftool\exiftool.exe   # Full path to ExifTool (Windows or Mac path depending on system)
+
+# === BASIC SETTINGS ===
+write_exif: true             # Write captions and tags into image metadata using ExifTool (if installed)
+recursive: true              # Process subfolders automatically (true = recursive)
+validate_tags: true          # If true, use BLIP2 to double-check if generated tags match the image. Adds "needs_review" if tags seem incorrect.
+
+# === MODEL SETTINGS ===
+model_name: flan-t5-xl       # BLIP2 model to use for captioning ('flan-t5-xl' or 'opt-2.7b')
+yolo_model_path: models/yolov8x.pt   # Path to YOLOv8 weights used for object detection
+
+# === TAGGING RULES ===
+max_tags: 30                 # Maximum number of tags to generate per image
+min_tag_length: 3            # Tags shorter than this will be removed
+yolo_conf_threshold: 0.5     # Minimum confidence (0.0–1.0) to keep a YOLO detection as a tag
+
+# === IMAGE PROCESSING ===
+chunk_size: 20               # How many images to process at once (controls memory usage)
+thumbnail_size: 1000         # Resize images to this width/height before tagging (speeds up processing)
+
+# === FILES & FORMATS ===
+log_file_name: tagger_log.txt      # Name of the log file used to mark processed folders
+supported_exts: .jpg, .jpeg, .png, .tif, .tiff   # Comma-separated list of allowed image file extensions
+
+# === ISOLATION DETECTION ===
+isolated_bg_ratio: 0.4       # Percent of background that must be white or black to consider an object "isolated"
+
+# === PROMPTS (BLIP2) ===
+prompt_caption: >
+  Describe this photo like you would for a stock photography database. Be specific, and limit your response to one sentence. Focus on visible objects, people, setting, and composition. Avoid abstract terms.
+
+prompt_tag: >
+  Create 10 descriptive stock photo tags based on this sentence:
+
+# === TAG FILTERING ===
+# Comma-separated list of common filler words to ignore in tags
+tag_fragments: a, an, the, in, on, of, and, with, to, at, for, is, are, was, were, be, been, being, have, has, had   

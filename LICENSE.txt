@@ -1,0 +1,25 @@
+AI IMAGE TAGGER — NON-COMMERCIAL LICENSE
+
+Copyright (c) 2025 Mac
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to use, modify, and share the Software for personal, academic, or non-commercial research purposes only, subject to the following conditions:
+
+1. NON-COMMERCIAL USE ONLY
+This software may not be used in any product, project, or service that is offered for sale, subscription, advertising, or other commercial benefit. Any use of the Software for commercial purposes requires a separate license.
+
+2. NO REDISTRIBUTION FOR COMMERCIAL GAIN
+You may not sell, license, or otherwise redistribute the Software or modified versions of it as part of a commercial offering without prior written permission from the original author.
+
+3. ATTRIBUTION REQUIRED
+This license and copyright notice must be retained in all copies or substantial portions of the Software.
+
+4. THIRD-PARTY TOOLS
+This software uses external tools and models, including but not limited to YOLOv8 (GPL-3.0), BLIP2 (varied), and ExifTool. Users are responsible for separately complying with those licenses for both personal and commercial use. The author of this software does not redistribute these dependencies.
+
+5. WARRANTY DISCLAIMER
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DAMAGES OR CLAIMS ARISING OUT OF USE OR INABILITY TO USE THE SOFTWARE.
+
+6. CONTACT FOR COMMERCIAL LICENSING
+To obtain a commercial license, please contact: To obtain a commercial license, please open an issue or reach out via GitHub: https://github.com/macstrat/AI-Tagger
+
+

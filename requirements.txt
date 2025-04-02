@@ -1,0 +1,13 @@
+transformers
+torch
+ultralytics
+nltk
+Pillow
+pyyaml
+tqdm
+face_recognition
+inflect
+colorama
+opencv-python
+scikit-learn
+psutil
