@@ -10,6 +10,7 @@ ___  ___              _            ___   _____     _____
 
 
 AI Image Tagger v1.2 - Caption, Tag, and Metadata Your Images
+```
 
 # AI Image Tagger (v1.2)
 
