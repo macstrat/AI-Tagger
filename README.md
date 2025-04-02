@@ -43,7 +43,7 @@ AI Image Tagger v1.2 - Caption, Tag, and Metadata Your Images
 ### System Requirements
 - **Recommended GPU:** NVIDIA RTX 3060 or better (8GB+ VRAM)
 - **Minimum RAM:** 16GB (32GB preferred for large batches)
-- **Disk Space:** ~10GB after setup (models + dependencies)
+- **Disk Space:** ~15GB after setup (models + dependencies)
 - **OS Compatibility:** Windows 10+, macOS 11+, Ubuntu 20.04+
 
 ### Important Notes
