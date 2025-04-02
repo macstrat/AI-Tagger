@@ -598,7 +598,7 @@ def process_folder(root_folder, config, processor, model):
 
     for dirpath, _, filenames in os.walk(root_folder):
         # 🚫 Skip folder if tagger_log.txt exists
-        llog_filename = config.get("log_file_name", "tagger_log.txt")
+        log_filename = config.get("log_file_name", "tagger_log.txt")
         log_file_path = os.path.join(dirpath, log_filename)
         if os.path.exists(log_file_path):
             tqdm.write(f"✅ {os.path.basename(dirpath)} has been processed and has a log file")
