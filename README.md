@@ -97,7 +97,6 @@ You will be prompted to select a folder. The tool will recursively process all s
   - Gender / group detection (via face count)
   - Activity keyword matching
   - Folder name context (soft influence)
-  - Color tone (BLIP2, optional)
 - Detects "isolated" objects if:
   - Background is mostly white/black (>= 40%)
   - Subject is fully visible and not a person
@@ -189,17 +188,6 @@ This prevents reprocessing the same folder unless the log is removed.
 
 ---
 
-## Who Is This For?
-Whether you’re a:
-- Designer tagging retro stock photography
-- Archivist generating metadata
-- Dataset builder preparing for AI training
-- Casual user wanting descriptive search tags...
-
-This tool aims to make bulk tagging easy, fast, and explainable.
-
----
-
 ## Folder Context Biasing
 The folder name (after the dash `-`) is used to softly bias tag prompts.
 For example, a folder named:
@@ -215,14 +203,6 @@ Will bias tags toward "medical" concepts if relevant.
 - EXIF-writing requires ExifTool installed
 - Log file is named `tagger_log.txt`
 - Re-running will **skip already-logged folders**
-
----
-
-## Developer Notes
-- Models are cached to `./models/`
-- All major components modularized:
-  - `setup_model()`, `process_folder()`, `generate_batch_captions()`, etc.
-- Extendable for future features (color quantization, object cropping, etc.)
 
 ---
 
