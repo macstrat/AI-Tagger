@@ -20,6 +20,7 @@ AI Image Tagger v1.2 - Caption, Tag, and Metadata Your Images
 
 ## Command Line Usage
 
+If just the arguements are run with the script, a window to select teh root folder will appear.
 To run the AI Image Tagger from the command line, use the following syntax:
 
 ```bash
@@ -27,9 +28,8 @@ python tagger_1.3_cleaned.py --folder "D:\AI Image Tagger\Images\Sample Set" --c
 ```
 
 ### Notes:
-- Ensure the folder path does **not** have a trailing backslash (`\`). 
-- If just the arguements are run with the script, a window to select teh root folder will appear. 
-
+- Ensure the folder path does **not** have a trailing backslash (`\`).
+  
 ---
 
 ## Features
