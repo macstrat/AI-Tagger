@@ -5,7 +5,27 @@
 - Fixed a UTF-8 Write error with exiftool. 
 - Filed an issue with old Photoshop tags throwing back an Exif Write Errorex
 
-4/3/2025 ----
-
+Version 1.3 - April 3, 2025
 - Upgraded YOLO from v8 to v11 (models/yolo11x.pt)
-- Updated README and config to reflect YOLOv11 support
+- Added full command-line support using --folder and --config flags.
+- load_config() now accepts an optional path and defaults to config.yaml.
+- All major config options moved to YAML:
+  - supported_exts
+  - chunk_size
+  - model_name
+  - yolo_model_path
+  - recursive
+  - write_exif
+  - max_tags, min_tag_length
+- setup_yolo() moved outside of process_folder() for better reuse.
+- Removed unused imports and cleaned import structure.
+- supported_exts now correctly lowercased and validated.
+- Prints supported_exts and target folder on launch for debugging.
+- Added fallback defaults if supported_exts is not found in config.
+- Added recursive flag handling for non-recursive mode.
+- Folder walk now prints folder names and file counts being scanned.
+- Skipped folders now report if tagger_log.txt exists.
+- Improved "Original mode" logging to display "Greyscale" instead of "L".
+- RAM and GPU usage now logged at folder level, not per image.
+- Additional checks to ensure folders aren't skipped silently.
+- Cleaned up multiple error messages and user-facing logs.
