@@ -20,7 +20,7 @@ AI Image Tagger v1.2 - Caption, Tag, and Metadata Your Images
 
 ## Command Line Usage
 
-If just the arguements are run with the script, a window to select teh root folder will appear.
+If no arguements are run with the script, a window to select the root folder will appear.
 To run the AI Image Tagger from the command line, use the following syntax:
 
 ```bash
