@@ -21,7 +21,7 @@ AI Image Tagger v1.2 - Caption, Tag, and Metadata Your Images
 ## Features
 
 - **Caption Generation** (BLIP2 Flan-T5-XL)
-- **Object Detection** (YOLOv8x)
+- **Object Detection** (YOLOv11x)
 - **Face Detection** (via `face_recognition`)
 - **Enriched Tagging** with gender, pluralization, activities, and folder context
 - **Isolation Detection** for clean product-style shots
@@ -75,7 +75,7 @@ python setup_tagger.py
 This will:
 - Install dependencies (`requirements.txt`)
 - Download BLIP2 (Flan-T5-XL)
-- Download YOLOv8x weights
+- Download YOLOv11x weights
 
 ### 3. Place Your Images
 Put your `.jpg`, `.png`, `.tif`, or `.tiff` images inside a folder (or nested folders).
