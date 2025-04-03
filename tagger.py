@@ -59,6 +59,16 @@ COLOR_FIXES = {
     'pink rose': 'white rose'
 }
 
+def ding():
+    try:
+        if os.name == 'nt':  # Windows
+            import winsound
+            winsound.MessageBeep()
+        else:  # macOS / Linux
+            print('\a', end='', flush=True)  # ASCII bell
+    except:
+        pass
+
 def spinner(msg="Working...", delay=0.1):
     done_flag = {"done": False}
 
@@ -646,7 +656,7 @@ def write_exif(image_path, caption, tags):
 
 
 def process_folder(root_folder, config, processor, model):
-    yolo_model = setup_yolo('models/yolov8x.pt')
+    yolo_model = setup_yolo('models/yolo11x.pt')
     supported_exts = ['.jpg', '.jpeg', '.png', '.tif', '.tiff']
     chunk_size = 20
 
@@ -746,15 +756,9 @@ def process_folder(root_folder, config, processor, model):
                     tags = set(enrich_tags(tags, caption, face_count, path))
 
                     yolo_results = yolo_model(path, verbose=False)[0]
-                    object_counts = {}
-                    for box in yolo_results.boxes:
-                        if box.conf < 0.5:
-                            continue
-                        tag = yolo_model.names[int(box.cls)]
-                        tags.add(tag)
-                        object_counts[tag] = object_counts.get(tag, 0) + 1
-                    for obj, count in object_counts.items():
-                        tags.add(p.plural(obj) if count > 1 else obj)
+                    # YOLO is only used for isolation detection now
+                    # No object tags are added
+
 
                     isolated = detect_isolated_subject(path, yolo_model, img, img_array, yolo_results)
                     if isolated:
@@ -798,16 +802,16 @@ def process_folder(root_folder, config, processor, model):
                     tqdm.write("")
                     tqdm.write(f"{Fore.CYAN}{Style.BRIGHT}Now Processing Image {filename}: {img_shape[1]}x{img_shape[0]} ({detection_count} detections), {inf_time}{Style.RESET_ALL}")
                     tqdm.write(f"{Style.DIM}{'Path:'.rjust(label_width)}   {path}")
-                    if yolo_results and hasattr(yolo_results, 'speed') and yolo_results.speed:
-                        pre_time = f"{round(yolo_results.speed.get('preprocess', 0), 1)}ms"
-                        inf_time = f"{round(yolo_results.speed.get('inference', 0), 1)}ms"
-                        post_time = f"{round(yolo_results.speed.get('postprocess', 0), 1)}ms"
-                    
-                        tqdm.write(f"{'YOLO Speed:'.rjust(label_width)}   {pre_time:<8}   preprocess")
-                        tqdm.write(f"{' '.rjust(label_width)}   {inf_time:<8}   inference")
-                        tqdm.write(f"{' '.rjust(label_width)}   {post_time:<8}   postprocess per image at shape {yolo_shape}")
-                    else:
-                        tqdm.write(f"{'YOLO Speed:'.rjust(label_width)}   No YOLO objects detected — skipping timing")
+                   # if yolo_results and hasattr(yolo_results, 'speed') and yolo_results.speed:
+                   #     pre_time = f"{round(yolo_results.speed.get('preprocess', 0), 1)}ms"
+                   #     inf_time = f"{round(yolo_results.speed.get('inference', 0), 1)}ms"
+                   #     post_time = f"{round(yolo_results.speed.get('postprocess', 0), 1)}ms"
+                   # 
+                   #     tqdm.write(f"{'YOLO Speed:'.rjust(label_width)}   {pre_time:<8}   preprocess")
+                   #     tqdm.write(f"{' '.rjust(label_width)}   {inf_time:<8}   inference")
+                   #     tqdm.write(f"{' '.rjust(label_width)}   {post_time:<8}   postprocess per image at shape {yolo_shape}")
+                   # else:
+                   #     tqdm.write(f"{'YOLO Speed:'.rjust(label_width)}   No YOLO objects detected — skipping timing")
                     tqdm.write(f"{Style.BRIGHT}{'Isolated:'.rjust(label_width)}{Style.RESET_ALL}   {'True' if isolated else 'False'}")
                     tqdm.write(f"{Style.BRIGHT}{'ExifTool Output:'.rjust(label_width)}{Style.RESET_ALL}   {'1 image files updated' if config['write_exif'] else 'Skipped'}")
                     tqdm.write(f"{Style.BRIGHT}{'Caption:'.rjust(label_width)}{Style.RESET_ALL}   {Fore.YELLOW}{caption}{Style.RESET_ALL}")
@@ -906,6 +910,8 @@ def process_folder(root_folder, config, processor, model):
             with open(log_path, "w", encoding="utf-8") as f:
                 f.write("\n".join(summary_lines + [""] + folder_log))
             tqdm.write(f"📄 Saved log to {log_path}")
+            tqdm.write(f"[✔] Finished folder: {os.path.basename(dirpath)}")
+            ding()
 
 def choose_folder():
     """
