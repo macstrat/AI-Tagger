@@ -8,7 +8,7 @@ validate_tags: true          # If true, use BLIP2 to double-check if generated t
 
 # === MODEL SETTINGS ===
 model_name: flan-t5-xl       # BLIP2 model to use for captioning ('flan-t5-xl' or 'opt-2.7b')
-yolo_model_path: models/yolov8x.pt   # Path to YOLOv8 weights used for object detection
+yolo_model_path: models/yolo11x.pt   # Path to YOLOv8 weights used for object detection
 
 # === TAGGING RULES ===
 max_tags: 30                 # Maximum number of tags to generate per image
