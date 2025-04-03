@@ -4,3 +4,8 @@
 - Added File name filtering and more directed prompting. 
 - Fixed a UTF-8 Write error with exiftool. 
 - Filed an issue with old Photoshop tags throwing back an Exif Write Errorex
+
+4/3/2025 ----
+
+- Upgraded YOLO from v8 to v11 (models/yolo11x.pt)
+- Updated README and config to reflect YOLOv11 support
