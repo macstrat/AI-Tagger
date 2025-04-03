@@ -14,7 +14,7 @@ AI Image Tagger v1.2 - Caption, Tag, and Metadata Your Images
 
 # AI Image Tagger (v1.2)
 
-> A powerful Python-based tool for auto-captioning and keyword-tagging image folders using BLIP2 and YOLOv8 — with metadata writing, isolation detection, and contextual enrichment.
+> A powerful Python-based tool for auto-captioning and keyword-tagging image folders using BLIP2 and YOLOv11 — with metadata writing, isolation detection, and contextual enrichment.
 
 ---
 
