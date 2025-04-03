@@ -13,11 +13,10 @@ yolo_model_path: models/yolo11x.pt   # Path to YOLOv8 weights used for object de
 # === TAGGING RULES ===
 max_tags: 30                 # Maximum number of tags to generate per image
 min_tag_length: 3            # Tags shorter than this will be removed
-yolo_conf_threshold: 0.5     # Minimum confidence (0.0–1.0) to keep a YOLO detection as a tag
 
 # === IMAGE PROCESSING ===
 chunk_size: 20               # How many images to process at once (controls memory usage)
-thumbnail_size: 1000         # Resize images to this width/height before tagging (speeds up processing)
+thumbnail_size: 800         # Resize images to this width/height before tagging (speeds up processing)
 
 # === FILES & FORMATS ===
 log_file_name: tagger_log.txt      # Name of the log file used to mark processed folders
