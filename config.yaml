@@ -31,6 +31,15 @@ prompt_caption: >
 
 prompt_tag: >
   Create 10 descriptive stock photo tags based on this sentence:
+  
+# === Word Lists ===
+bad_ing_words: >    # A list of bad -ing verbs to be discounted, no current way around this with current language models
+  being, doing, having, holding, getting, making, taking, giving, helping, using, feeling, thinking, knowing, seeing, watching, looking, telling, asking, showing, needing, wanting, planning, trying, starting, ending, saying, talking, listening, hearing, moving, changing, becoming, keeping, bringing, leaving, spending, meeting, loving, calling, following, joining, considering, choosing, leading, agreeing, deciding, putting, sitting, standing, blowing
+  
+activity_keywords: >    # A List of good -ing verbs for tagging, these words WILL get thru the filters
+  working, celebrating, dancing, meeting, laughing, reading, drinking, thinking, arguing, cooking, eating, shopping, hugging, driving, relaxing, walking, running, jumping, pointing, teaching, typing, writing, cleaning, sleeping, watching, listening, greeting, presenting, playing, gardening, praying, biking, swimming, skating, clapping, high-fiving, singing, posing, climbing, traveling, waiting, photographing, filming, repairing, volunteering, training, studying, exercising, painting, decorating, caring, fixing, cheering, jogging, interviewing, counseling, helping, consulting, leading, organizing, directing, collaborating, shaking hands, stretching, attending, napping, parenting, skateboarding, snowboarding, waving, conversing, grilling, jumpstarting, protesting, rejoicing, scrubbing, examining, rollerblading
+
+
 
 # === TAG FILTERING ===
 # Comma-separated list of common filler words to ignore in tags
