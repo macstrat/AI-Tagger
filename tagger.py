@@ -242,10 +242,15 @@ def enrich_tags(tags, caption, face_count, image_path):  # Adds context-aware ta
             noun_counts[singular] = noun_counts.get(singular, 0) + 1
 
     for noun, count in noun_counts.items():
+        # Skip generic verb-based nouns like "holding", "doing", etc.
+        if noun.endswith("ing") and not wn.synsets(noun, pos=wn.NOUN):
+            continue
+    
         if count > 1:
-            enriched.add(p.plural(noun))  # Use plural if seen multiple times
+            enriched.add(p.plural(noun))
         else:
             enriched.add(noun)
+    
 
     # === FILTER GENERIC, NON-VISUAL WORDS UNLESS MATERIAL CONTEXT PRESENT ===
     generic_exclusions = {"background", "surface", "close", "next"}
@@ -256,19 +261,9 @@ def enrich_tags(tags, caption, face_count, image_path):  # Adds context-aware ta
         enriched -= generic_exclusions
 
     # === ACTIVITY INFERENCE BASED ON 90s-STOCK COMMON TERMS ===
-    activity_keywords = {
-        "working", "celebrating", "dancing", "meeting", "laughing", "reading", "drinking", "thinking", "arguing",
-        "cooking", "eating", "shopping", "talking", "hugging", "driving", "relaxing", "walking", "running", "jumping",
-        "pointing", "teaching", "typing", "writing", "calling", "cleaning", "sleeping", "waking", "watching",
-        "listening", "greeting", "presenting", "playing", "gardening", "biking", "swimming", "skating", "clapping",
-        "high-fiving", "singing", "posing", "climbing", "traveling", "waiting", "standing", "sitting", "photographing",
-        "filming", "repairing", "volunteering", "training", "discussing", "studying", "exercising",
-        "painting", "decorating", "caring", "fixing", "cheering", "jogging", "interviewing",
-        "counseling", "helping", "consulting", "leading", "organizing", "directing", "collaborating", "shaking hands",
-        "planning", "browsing", "flipping", "explaining", "styling", "answering", "stretching", "attending",
-        "napping", "parenting", "skateboarding", "snowboarding", "waving", "testing", "conversing",
-        "grilling", "jumpstarting", "protesting", "rejoicing", "scrubbing", "examining"
-    }
+    activity_keywords_raw = config.get("activity_keywords", "")
+    activity_keywords = set(map(str.strip, activity_keywords_raw.split(",")))
+
 
     for word in activity_keywords:
         if word in caption_lower:
@@ -277,13 +272,6 @@ def enrich_tags(tags, caption, face_count, image_path):  # Adds context-aware ta
     # === SPECIAL CASES: WORK & FAMILY ===
     if "family" in caption_lower:
         enriched.add("family")
-
-    work_terms = {
-        "office", "meeting", "coworker", "colleague", "desk",
-        "computer", "presentation", "conference", "business"
-    }
-    if any(term in caption_lower for term in work_terms):
-        enriched.add("work")
 
     # === CLEANUP: REMOVE REDUNDANT 'person' IF GENDER INFO PRESENT ===
     if 'person' in enriched and ('man' in enriched or 'woman' in enriched):
@@ -377,7 +365,21 @@ def generate_batch_captions(image_paths, processor, model, preloaded_images=None
 
         keywords = [kw.strip() for kw in tag_output.split(",") if kw.strip()]  # Split into individual tags
 
-        keywords = [kw for kw in keywords if len(kw.split()) <= 3]  # Remove multi-word phrases
+        split_keywords = [] # Remove multi-word phrases
+        for kw in keywords:
+            if len(kw.split()) == 1:
+                split_keywords.append(kw)
+            else:
+                # Split multi-word tags into individual tokens if they are not too generic
+                words = [w for w in kw.split() if len(w) >= 3 and w.lower() not in {'and', 'the', 'a', 'of'}]
+                split_keywords.extend(words)
+        
+        keywords = split_keywords
+        
+        # Final filter: remove bad or non-visual -ing words
+        bad_ing = set(map(str.strip, config.get("bad_ing_words", "").split(",")))
+        keywords = [k for k in keywords if not (k.endswith("ing") and k in bad_ing)]
+        
 
         keywords = [k for k in keywords if k.lower() not in {  # Remove known bad outputs
             "description", "descriptions", "detailed", "detail", "jpg", "jpeg", "image", "photo", "picture", "pictures"
@@ -389,6 +391,16 @@ def generate_batch_captions(image_paths, processor, model, preloaded_images=None
 
 
 # Tag Cleaning / Processing
+def remove_redundant_compounds(tag_list):
+    base_tags = set(tag_list)
+    cleaned = []
+    for tag in tag_list:
+        words = tag.split()
+        if len(words) > 1 and all(w in base_tags for w in words):
+            continue  # Skip compound if all parts are already present
+        cleaned.append(tag)
+    return cleaned
+
 
 def clean_tags(tags, config=None):  # Cleans up tag list by removing fragments, junk, and long phrases
     cleaned = set()
@@ -404,8 +416,15 @@ def clean_tags(tags, config=None):  # Cleans up tag list by removing fragments, 
         if len(tag) < min_length:  # Skip too-short tags
             continue
 
-        if len(tag.split()) > 3:  # Skip tags that are likely full sentences
+        if len(tag.split()) > 1:  # Skip tags that are likely full sentences
             continue
+        # Filter out weak -ing verbs like "holding", unless they're known nouns
+        if tag.endswith("ing"):
+            lemma = lemmatizer.lemmatize(tag, pos='v')
+            noun_synsets = wn.synsets(tag, pos=wn.NOUN)
+            if not noun_synsets and lemma != tag:
+                continue  # Likely a verb, not a noun — drop it
+        
 
         cleaned.add(tag)  # Keep tag if it passed all checks
 
@@ -748,6 +767,9 @@ def process_folder(root_folder, config, processor, model, yolo_model):  # Proces
                     isolated = detect_isolated_subject(path, yolo_model, img, img_array, yolo_results, config)
                     if isolated:
                         tags.add("isolated")
+                    
+                    # Compound cleanup
+                    tags = remove_redundant_compounds(tags)
 
                     tags = set(clean_tags(tags, config))
                     max_tags = config.get("max_tags", 30)
